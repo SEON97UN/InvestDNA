@@ -7,7 +7,7 @@ import { LanguageProvider } from "./hooks/useLanguage.jsx";
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <LanguageProvider>
-      <App />Z
+      <App />
     </LanguageProvider>
   </StrictMode>
 );
