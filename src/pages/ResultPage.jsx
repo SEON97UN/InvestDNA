@@ -97,7 +97,7 @@ export default function ResultPage() {
           <p className="font-bold text-base leading-relaxed mb-3" style={{ color: "#1A1A2E", wordBreak: "keep-all", overflowWrap: "break-word" }}>
             {type.description.split(". ")[0] + "."}
           </p>
-          <p className="text-sm leading-loose" style={{ color: "#1A1A2E55", wordBreak: "keep-all", overflowWrap: "break-word" }}>
+          <p className="text-sm leading-loose" style={{ color: "#1A1A2E80", wordBreak: "keep-all", overflowWrap: "break-word" }}>
             {type.description.split(". ").slice(1).join(". ")}
           </p>
         </div>
@@ -151,14 +151,14 @@ export default function ResultPage() {
               <div className="w-1.5 h-1.5 rounded-full" style={{ background: "#16A34A" }} />
               <p className="text-xs uppercase tracking-widest font-semibold" style={{ color: "#16A34A" }}>강점</p>
             </div>
-            <p className="text-xs leading-loose" style={{ color: "#1A1A2E65", wordBreak: "keep-all" }}>{type.strength}</p>
+            <p className="text-xs leading-loose" style={{ color: "#1A1A2E80", wordBreak: "keep-all" }}>{type.strength}</p>
           </div>
           <div className="rounded-2xl p-5" style={{ background: "#FFFFFF", border: "1.5px solid #1A1A2E08", boxShadow: "0 2px 12px rgba(26,26,46,0.05)" }}>
             <div className="flex items-center gap-1.5 mb-3">
               <div className="w-1.5 h-1.5 rounded-full" style={{ background: "#DC2626" }} />
               <p className="text-xs uppercase tracking-widest font-semibold" style={{ color: "#DC2626" }}>약점</p>
             </div>
-            <p className="text-xs leading-loose" style={{ color: "#1A1A2E65", wordBreak: "keep-all" }}>{type.weakness}</p>
+            <p className="text-xs leading-loose" style={{ color: "#1A1A2E80", wordBreak: "keep-all" }}>{type.weakness}</p>
           </div>
         </div>
 
@@ -167,7 +167,7 @@ export default function ResultPage() {
           className="rounded-2xl p-5 flex items-center justify-between"
           style={{ background: "#FFFFFF", border: "1.5px solid #1A1A2E08", boxShadow: "0 2px 12px rgba(26,26,46,0.05)" }}
         >
-          <p className="text-xs uppercase tracking-widest font-semibold" style={{ color: "#1A1A2E30" }}>대표 투자자</p>
+          <p className="text-xs uppercase tracking-widest font-semibold" style={{ color: "#1A1A2E50" }}>대표 투자자</p>
           <p className="font-bold text-sm" style={{ color: c.primary }}>{type.representative}</p>
         </div>
 
@@ -176,7 +176,7 @@ export default function ResultPage() {
           className="rounded-2xl p-5"
           style={{ background: "#FFFFFF", border: "1.5px solid #1A1A2E08", boxShadow: "0 2px 12px rgba(26,26,46,0.05)" }}
         >
-          <p className="text-xs uppercase tracking-widest font-semibold mb-4" style={{ color: "#1A1A2E30" }}>궁합 유형</p>
+          <p className="text-xs uppercase tracking-widest font-semibold mb-4" style={{ color: "#1A1A2E50" }}>궁합 유형</p>
 
           {compatibleType && (
             <div className="flex items-center gap-3 mb-3">
@@ -198,14 +198,14 @@ export default function ResultPage() {
             <div className="w-full h-px mb-4" style={{ background: `linear-gradient(90deg, ${c.primary}, ${compatibleType.color.primary})` }} />
           )}
 
-          <p className="text-xs leading-loose mb-4" style={{ color: "#1A1A2E55", wordBreak: "keep-all" }}>
+          <p className="text-xs leading-loose mb-4" style={{ color: "#1A1A2E80", wordBreak: "keep-all" }}>
             {type.compatibleReason}
           </p>
 
           <button
             onClick={() => navigate("/types")}
             className="w-full py-2.5 rounded-xl text-xs font-semibold transition-all duration-200 hover:scale-[1.02]"
-            style={{ background: "#F7F5F0", border: `1.5px solid ${c.primary}25`, color: "#1A1A2E50" }}
+            style={{ background: "#F7F5F0", border: `1.5px solid ${c.primary}25`, color: "#1A1A2E65" }}
           >
             모든 유형 간 관계 탐색하기 →
           </button>
@@ -258,7 +258,7 @@ export default function ResultPage() {
             <br />
             투자 권유 또는 투자 자문이 아닙니다.
           </p>
-          <p className="text-xs" style={{ color: "#1A1A2E18" }}>
+          <p className="text-xs" style={{ color: "#1A1A2E30" }}>
             © 2026 InvestDNA. All rights reserved.
           </p>
         </div>

@@ -57,7 +57,7 @@ export default function TypesPage() {
           style={{
             background: "#FFFFFF",
             border: "1.5px solid #1A1A2E12",
-            color: "#1A1A2E60",
+            color: "#1A1A2E75",
             boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
           }}
         >
@@ -68,7 +68,7 @@ export default function TypesPage() {
           <div className="h-px w-6" style={{ background: "#1A1A2E25" }} />
           <p
             className="text-xs tracking-[0.25em] uppercase font-medium"
-            style={{ color: "#1A1A2E40" }}
+            style={{ color: "#1A1A2E60" }}
           >
             Investor Archetypes
           </p>
@@ -83,7 +83,7 @@ export default function TypesPage() {
         >
           투자자 유형 탐색
         </h1>
-        <p className="text-sm" style={{ color: "#1A1A2E50", wordBreak: "keep-all" }}>
+        <p className="text-sm" style={{ color: "#1A1A2E65", wordBreak: "keep-all" }}>
           8가지 투자자 유형을 선택하고, 유형 간의 관계를 탐색해보세요.
         </p>
       </div>
@@ -92,7 +92,7 @@ export default function TypesPage() {
       <div className="w-full max-w-2xl mb-8 relative z-10">
         <p
           className="text-xs uppercase tracking-widest mb-3 font-semibold"
-          style={{ color: "#1A1A2E30" }}
+          style={{ color: "#1A1A2E50" }}
         >
           유형 선택
         </p>
@@ -125,7 +125,7 @@ export default function TypesPage() {
                 />
                 <span
                   className="text-xs font-bold text-center leading-tight"
-                  style={{ color: isSelected ? type.color.primary : "#1A1A2E50" }}
+                  style={{ color: isSelected ? type.color.primary : "#1A1A2E65" }}
                 >
                   {type.name}
                 </span>
@@ -172,7 +172,7 @@ export default function TypesPage() {
             </h2>
             <p
               className="text-sm"
-              style={{ color: "#1A1A2E55", wordBreak: "keep-all" }}
+              style={{ color: "#1A1A2E80", wordBreak: "keep-all" }}
             >
               "{selectedTypeData.philosophy}"
             </p>
@@ -181,7 +181,7 @@ export default function TypesPage() {
           {/* 관계 목록 */}
           <p
             className="text-xs uppercase tracking-widest mb-3 font-semibold"
-            style={{ color: "#1A1A2E30" }}
+            style={{ color: "#1A1A2E50" }}
           >
             다른 유형과의 관계
           </p>
@@ -281,7 +281,7 @@ export default function TypesPage() {
                         >
                           <p
                             className="text-sm leading-loose"
-                            style={{ color: "#1A1A2E60", wordBreak: "keep-all" }}
+                            style={{ color: "#1A1A2E75", wordBreak: "keep-all" }}
                           >
                             {relation.description}
                           </p>
@@ -326,7 +326,7 @@ export default function TypesPage() {
               ))}
             </div>
           </div>
-          <p className="text-sm" style={{ color: "#1A1A2E40" }}>
+          <p className="text-sm" style={{ color: "#1A1A2E60" }}>
             위에서 유형을 선택하면 관계 분석이 시작됩니다.
           </p>
         </div>
@@ -336,13 +336,13 @@ export default function TypesPage() {
       <div className="text-center flex flex-col gap-1 relative z-10 mt-4 mb-8">
         <p
           className="text-xs"
-          style={{ color: "#1A1A2E22", wordBreak: "keep-all" }}
+          style={{ color: "#1A1A2E40", wordBreak: "keep-all" }}
         >
           본 테스트는 교육 및 오락 목적으로 제공되며,
           <br />
           투자 권유 또는 투자 자문이 아닙니다.
         </p>
-        <p className="text-xs" style={{ color: "#1A1A2E18" }}>
+        <p className="text-xs" style={{ color: "#1A1A2E30" }}>
           © 2026 InvestDNA. All rights reserved.
         </p>
       </div>
