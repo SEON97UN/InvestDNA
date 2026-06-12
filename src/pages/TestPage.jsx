@@ -42,7 +42,7 @@ export default function TestPage() {
     ];
     if (currentIndex + 1 >= questions.length) {
       const result = calculateResult(newAnswers);
-      navigate("/result", { state: { result } });
+      navigate(`/result/${result.type.id}`, { state: { scores: result.scores } });
     } else {
       transitionTo(() => {
         setAnswers(newAnswers);
@@ -70,7 +70,6 @@ export default function TestPage() {
       className="min-h-screen flex flex-col items-center justify-center px-4 sm:px-6 py-12"
       style={{ background: "#F7F5F0" }}
     >
-      {/* 배경 도트 패턴 */}
       <div
         className="fixed inset-0 pointer-events-none"
         style={{
@@ -94,38 +93,25 @@ export default function TestPage() {
           >
             {currentIndex === 0 ? "처음으로" : "이전 질문"}
           </button>
-          <span
-            className="text-sm font-semibold"
-            style={{ color: "#1A1A2E50" }}
-          >
+          <span className="text-sm font-semibold" style={{ color: "#1A1A2E50" }}>
             {currentIndex + 1}
             <span style={{ color: "#1A1A2E25" }}> / {questions.length}</span>
           </span>
           <span
             className="text-sm font-black"
-            style={{
-              color: "#1A1A2E25",
-              fontFamily: "'Noto Serif KR', serif",
-            }}
+            style={{ color: "#1A1A2E25", fontFamily: "'Noto Serif KR', serif" }}
           >
             Invest<span style={{ color: "#D97706" }}>DNA</span>
           </span>
         </div>
 
-        {/* 프로그레스 바 */}
         <div
           className="w-full rounded-full overflow-hidden"
-          style={{
-            height: "3px",
-            background: "#1A1A2E08",
-          }}
+          style={{ height: "3px", background: "#1A1A2E08" }}
         >
           <div
             className="h-full rounded-full transition-all duration-500"
-            style={{
-              width: `${progress}%`,
-              background: "#D97706",
-            }}
+            style={{ width: `${progress}%`, background: "#D97706" }}
           />
         </div>
       </div>
@@ -147,19 +133,9 @@ export default function TestPage() {
             border: "1.5px solid #1A1A2E08",
           }}
         >
-          {/* 질문 영역 */}
-          <div
-            className="px-7 pt-7 pb-6"
-            style={{
-              borderBottom: "1px solid #1A1A2E06",
-            }}
-          >
-            {/* 축 레이블 */}
+          <div className="px-7 pt-7 pb-6" style={{ borderBottom: "1px solid #1A1A2E06" }}>
             <div className="flex items-center gap-2 mb-4">
-              <div
-                className="w-1.5 h-1.5 rounded-full"
-                style={{ background: "#D97706" }}
-              />
+              <div className="w-1.5 h-1.5 rounded-full" style={{ background: "#D97706" }} />
               <span
                 className="text-xs font-medium uppercase tracking-widest"
                 style={{ color: "#1A1A2E35" }}
@@ -167,8 +143,6 @@ export default function TestPage() {
                 {axisLabel[currentQuestion.axis]}
               </span>
             </div>
-
-            {/* 질문 텍스트 — 왼쪽 정렬, 적절한 크기 */}
             <p
               className="font-bold leading-relaxed"
               style={{
@@ -183,7 +157,6 @@ export default function TestPage() {
             </p>
           </div>
 
-          {/* 선택지 영역 */}
           <div className="p-4 flex flex-col gap-2">
             {currentQuestion.options.map((option, index) => {
               const isSelected = selected?.text === option.text;
@@ -195,13 +168,10 @@ export default function TestPage() {
                   style={{
                     padding: "14px 16px",
                     background: isSelected ? "#FEF3C7" : "#F7F5F0",
-                    border: isSelected
-                      ? "1.5px solid #D97706"
-                      : "1.5px solid transparent",
+                    border: isSelected ? "1.5px solid #D97706" : "1.5px solid transparent",
                     transform: isSelected ? "scale(1.01)" : "scale(1)",
                   }}
                 >
-                  {/* 체크 */}
                   <span
                     className="w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-all duration-200"
                     style={{
@@ -229,7 +199,6 @@ export default function TestPage() {
             })}
           </div>
 
-          {/* 다음 버튼 */}
           <div className="px-4 pb-4">
             <button
               onClick={handleNext}
@@ -239,9 +208,7 @@ export default function TestPage() {
                 background: selected !== null ? "#1A1A2E" : "#1A1A2E08",
                 color: selected !== null ? "#F7F5F0" : "#1A1A2E25",
                 cursor: selected !== null ? "pointer" : "not-allowed",
-                boxShadow: selected !== null
-                  ? "0 4px 16px rgba(26,26,46,0.2)"
-                  : "none",
+                boxShadow: selected !== null ? "0 4px 16px rgba(26,26,46,0.2)" : "none",
               }}
             >
               {currentIndex + 1 === questions.length ? "결과 보기" : "다음"}
@@ -250,17 +217,14 @@ export default function TestPage() {
         </div>
       </div>
 
-      {/* 면책 문구 */}
-      <p
-        className="text-xs mt-8 text-center relative z-10"
-        style={{ color: "#1A1A2E25" }}
-      >
-        본 테스트는 교육 및 오락 목적으로 제공되며,
-        투자 권유 또는 투자 자문이 아닙니다.
-      </p>
-        <p className="text-xs" style={{ color: "#1A1A2E18" }}>
+      <div className="mt-8 text-center flex flex-col gap-1 relative z-10">
+        <p className="text-xs" style={{ color: "#1A1A2E25" }}>
+          본 테스트는 교육 및 오락 목적으로 제공되며, 투자 권유 또는 투자 자문이 아닙니다.
+        </p>
+        <p className="text-xs" style={{ color: "#1A1A2E20" }}>
           © 2026 InvestDNA. All rights reserved.
-      </p>
+        </p>
+      </div>
     </div>
   );
 }
