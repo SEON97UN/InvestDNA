@@ -1,8 +1,9 @@
 import { useNavigate } from "react-router-dom";
-import { investmentTypes } from "../data/types";
+import { useLanguage } from "../hooks/useLanguage";
 
 export default function LandingPage() {
   const navigate = useNavigate();
+  const { lang, toggleLang, t } = useLanguage();
 
   const typeList = [
     { key: "long-qualitative-aggressive" },
@@ -30,9 +31,9 @@ export default function LandingPage() {
       />
 
       {/* 상단 8색 레인보우 바 */}
-      <div className="absolute top-0 left-0 right-0 h-1.5 flex">
+      <div className="absolute top-0 left-0 right-0 h-2 flex">
         {typeList.map(({ key }) => {
-          const type = investmentTypes[key];
+          const type = t.types_data[key];
           return (
             <div
               key={key}
@@ -43,54 +44,44 @@ export default function LandingPage() {
         })}
       </div>
 
-      {/* 좌측 세로 장식선 */}
-      <div
-        className="absolute left-8 top-1/2 -translate-y-1/2 w-px hidden lg:block"
+      {/* 언어 토글 */}
+      <button
+        onClick={toggleLang}
+        className="absolute top-6 right-6 z-20 font-semibold px-3 py-1.5 rounded-xl text-xs transition-all duration-200 hover:scale-105"
         style={{
-          height: "200px",
-          background: "linear-gradient(180deg, transparent, #1A1A2E15, transparent)",
+          background: "#FFFFFF",
+          border: "1.5px solid #1A1A2E12",
+          color: "#1A1A2E60",
+          boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
         }}
-      />
-      {/* 우측 세로 장식선 */}
-      <div
-        className="absolute right-8 top-1/2 -translate-y-1/2 w-px hidden lg:block"
-        style={{
-          height: "200px",
-          background: "linear-gradient(180deg, transparent, #1A1A2E15, transparent)",
-        }}
-      />
+      >
+        {lang === "ko" ? "EN" : "KR"}
+      </button>
 
       {/* 콘텐츠 */}
-      <div className="relative z-10 flex flex-col items-center w-full max-w-lg py-16">
+      <div className="relative z-10 flex flex-col items-center w-full max-w-lg py-14">
 
         {/* 상단 레이블 */}
-        <div
-          className="flex items-center gap-2 mb-8"
-        >
-          <div
-            className="h-px w-8"
-            style={{ background: "#1A1A2E30" }}
-          />
+        <div className="flex items-center gap-2 mb-7">
+          <div className="h-px w-8" style={{ background: "#1A1A2E30" }} />
           <p
             className="text-xs tracking-[0.25em] uppercase font-medium"
             style={{ color: "#1A1A2E50" }}
           >
-            Investment Personality Test
+            {t.landing.badge}
           </p>
-          <div
-            className="h-px w-8"
-            style={{ background: "#1A1A2E30" }}
-          />
+          <div className="h-px w-8" style={{ background: "#1A1A2E30" }} />
         </div>
 
         {/* 로고 */}
         <h1
-          className="text-6xl sm:text-7xl font-black tracking-tight mb-1 text-center"
+          className="text-6xl sm:text-7xl tracking-tight mb-1 text-center"
           style={{
             color: "#1A1A2E",
             fontFamily: "'Noto Serif KR', serif",
             letterSpacing: "-0.03em",
             lineHeight: 1.1,
+            fontWeight: 900,
           }}
         >
           Invest<span style={{ color: "#D97706" }}>DNA</span>
@@ -99,58 +90,50 @@ export default function LandingPage() {
         {/* 서브타이틀 */}
         <p
           className="text-base text-center mt-5 mb-1"
-          style={{
-            color: "#1A1A2E80",
-            lineHeight: 1.8,
-            letterSpacing: "0.01em",
-          }}
+          style={{ color: "#1A1A2E75", lineHeight: 1.8, letterSpacing: "0.01em" }}
         >
-          당신 안에 잠든 투자자의 DNA를 발견하세요.
+          {t.landing.subtitle}
         </p>
         <p
-          className="text-sm text-center mb-10"
+          className="text-sm text-center mb-9"
           style={{ color: "#1A1A2E40" }}
         >
-          8가지 투자자 유형 중 당신은 누구입니까?
+          {t.landing.subtitleSub}
         </p>
 
         {/* 유형 카드 그리드 */}
-        <div className="grid grid-cols-4 gap-2.5 w-full mb-10">
+        <div className="grid grid-cols-4 gap-2.5 w-full mb-7">
           {typeList.map(({ key }) => {
-            const type = investmentTypes[key];
+            const type = t.types_data[key];
+            const isCharcoal = type.color.primary === "#374151";
+            const displayColor = isCharcoal ? "#4B5563" : type.color.primary;
+
             return (
               <div
                 key={key}
                 className="rounded-2xl flex flex-col items-center justify-center gap-1.5 transition-all duration-300 hover:scale-105 hover:-translate-y-0.5 cursor-default"
                 style={{
-                  background: "#FFFFFF",
-                  border: `1.5px solid ${type.color.primary}25`,
-                  boxShadow: `0 2px 16px ${type.color.primary}12, 0 1px 4px rgba(0,0,0,0.04)`,
-                  minHeight: "88px",
-                  padding: "14px 8px",
+                  background: isCharcoal ? "#F8F8F8" : "#FFFFFF",
+                  border: `1.5px solid ${displayColor}30`,
+                  boxShadow: `0 2px 16px ${displayColor}15, 0 1px 4px rgba(0,0,0,0.05)`,
+                  minHeight: "96px",
+                  padding: "16px 8px",
                 }}
               >
-                {/* 컬러 닷 */}
                 <div
-                  className="w-2 h-2 rounded-full"
-                  style={{
-                    background: type.color.primary,
-                    boxShadow: `0 0 6px ${type.color.primary}60`,
-                  }}
+                  className="w-2.5 h-2.5 rounded-full"
+                  style={{ background: displayColor, boxShadow: `0 0 6px ${displayColor}50` }}
                 />
                 <span
                   className="font-bold text-center leading-tight"
-                  style={{
-                    color: type.color.primary,
-                    fontSize: "11px",
-                  }}
+                  style={{ color: displayColor, fontSize: "11px" }}
                 >
                   {type.name}
                 </span>
                 <span
                   className="text-center leading-tight"
                   style={{
-                    color: `${type.color.primary}60`,
+                    color: `${displayColor}65`,
                     fontSize: "9px",
                     fontWeight: 500,
                     letterSpacing: "0.02em",
@@ -165,10 +148,10 @@ export default function LandingPage() {
 
         {/* 구분선 */}
         <div
-          className="w-full mb-8"
+          className="w-full mb-6"
           style={{
             height: "1px",
-            background: "linear-gradient(90deg, transparent, #1A1A2E12, transparent)",
+            background: "linear-gradient(90deg, transparent, #1A1A2E10, transparent)",
           }}
         />
 
@@ -184,7 +167,7 @@ export default function LandingPage() {
           }}
         >
           <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/5 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
-          <span className="relative">나의 투자 DNA 분석하기</span>
+          <span className="relative">{t.landing.cta}</span>
         </button>
 
         {/* 유형 탐색 버튼 */}
@@ -198,54 +181,35 @@ export default function LandingPage() {
             letterSpacing: "0.01em",
           }}
         >
-          투자자 유형 탐색하기
+          {t.landing.explore}
         </button>
 
         {/* 메타 정보 */}
-        <div className="flex items-center justify-center gap-5 mt-6">
-          <span
-            className="text-xs flex items-center gap-1.5"
-            style={{ color: "#1A1A2E35" }}
-          >
+        <div className="flex items-center justify-center gap-5 mt-5">
+          {t.landing.meta.map((text) => (
             <span
-              className="w-1 h-1 rounded-full inline-block"
-              style={{ background: "#1A1A2E25" }}
-            />
-            약 3분 소요
-          </span>
-          <span
-            className="text-xs flex items-center gap-1.5"
-            style={{ color: "#1A1A2E35" }}
-          >
-            <span
-              className="w-1 h-1 rounded-full inline-block"
-              style={{ background: "#1A1A2E25" }}
-            />
-            15문항
-          </span>
-          <span
-            className="text-xs flex items-center gap-1.5"
-            style={{ color: "#1A1A2E35" }}
-          >
-            <span
-              className="w-1 h-1 rounded-full inline-block"
-              style={{ background: "#1A1A2E25" }}
-            />
-            무료
-          </span>
+              key={text}
+              className="text-xs flex items-center gap-1.5"
+              style={{ color: "#1A1A2E35" }}
+            >
+              <span
+                className="w-1 h-1 rounded-full inline-block"
+                style={{ background: "#1A1A2E20" }}
+              />
+              {text}
+            </span>
+          ))}
         </div>
 
         {/* 면책 문구 */}
-        <p
-          className="text-xs mt-10 text-center leading-relaxed"
-          style={{ color: "#1A1A2E25" }}
-        >
-          본 테스트는 교육 및 오락 목적으로 제공되며,
-          투자 권유 또는 투자 자문이 아닙니다.
-        </p>
+        <div className="mt-8 text-center flex flex-col gap-1">
+          <p className="text-xs leading-relaxed" style={{ color: "#1A1A2E25" }}>
+            {t.landing.disclaimer}
+          </p>
           <p className="text-xs" style={{ color: "#1A1A2E20" }}>
-            © 2026 InvestDNA. All rights reserved.
-        </p>
+            {t.landing.copyright}
+          </p>
+        </div>
       </div>
     </div>
   );

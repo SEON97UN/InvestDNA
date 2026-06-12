@@ -1,24 +1,20 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { questions } from "../data/questions";
+import { useLanguage } from "../hooks/useLanguage.jsx";
 import { calculateResult } from "../utils/scoring";
 
 export default function TestPage() {
   const navigate = useNavigate();
+  const { lang, toggleLang, t } = useLanguage();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState([]);
   const [selected, setSelected] = useState(null);
   const [animating, setAnimating] = useState(false);
   const [fadeIn, setFadeIn] = useState(true);
 
+  const questions = t.questions_data;
   const currentQuestion = questions[currentIndex];
   const progress = (currentIndex / questions.length) * 100;
-
-  const axisLabel = {
-    time: "시간 지평",
-    analysis: "분석 방식",
-    risk: "리스크 태도",
-  };
 
   const transitionTo = (callback) => {
     setAnimating(true);
@@ -30,9 +26,7 @@ export default function TestPage() {
     }, 250);
   };
 
-  const handleSelect = (option) => {
-    setSelected(option);
-  };
+  const handleSelect = (option) => setSelected(option);
 
   const handleNext = () => {
     if (selected === null || animating) return;
@@ -78,6 +72,20 @@ export default function TestPage() {
         }}
       />
 
+      {/* 언어 토글 */}
+      <button
+        onClick={toggleLang}
+        className="fixed top-6 right-6 z-20 font-semibold px-3 py-1.5 rounded-xl text-xs transition-all duration-200 hover:scale-105"
+        style={{
+          background: "#FFFFFF",
+          border: "1.5px solid #1A1A2E12",
+          color: "#1A1A2E60",
+          boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
+        }}
+      >
+        {lang === "ko" ? "EN" : "KR"}
+      </button>
+
       {/* 헤더 */}
       <div className="w-full max-w-lg mb-6 relative z-10">
         <div className="flex justify-between items-center mb-4">
@@ -91,7 +99,7 @@ export default function TestPage() {
               boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
             }}
           >
-            {currentIndex === 0 ? "처음으로" : "이전 질문"}
+            {currentIndex === 0 ? t.test.first : t.test.prev}
           </button>
           <span className="text-sm font-semibold" style={{ color: "#1A1A2E50" }}>
             {currentIndex + 1}
@@ -140,7 +148,7 @@ export default function TestPage() {
                 className="text-xs font-medium uppercase tracking-widest"
                 style={{ color: "#1A1A2E35" }}
               >
-                {axisLabel[currentQuestion.axis]}
+                {t.test.axisLabel[currentQuestion.axis]}
               </span>
             </div>
             <p
@@ -211,7 +219,7 @@ export default function TestPage() {
                 boxShadow: selected !== null ? "0 4px 16px rgba(26,26,46,0.2)" : "none",
               }}
             >
-              {currentIndex + 1 === questions.length ? "결과 보기" : "다음"}
+              {currentIndex + 1 === questions.length ? t.test.result : t.test.next}
             </button>
           </div>
         </div>
@@ -219,10 +227,10 @@ export default function TestPage() {
 
       <div className="mt-8 text-center flex flex-col gap-1 relative z-10">
         <p className="text-xs" style={{ color: "#1A1A2E25" }}>
-          본 테스트는 교육 및 오락 목적으로 제공되며, 투자 권유 또는 투자 자문이 아닙니다.
+          {t.test.disclaimer}
         </p>
         <p className="text-xs" style={{ color: "#1A1A2E20" }}>
-          © 2026 InvestDNA. All rights reserved.
+          {t.test.copyright}
         </p>
       </div>
     </div>

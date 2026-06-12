@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { investmentTypes } from "../data/types";
-import { getRelation, gradeConfig } from "../data/relations";
+import { useLanguage } from "../hooks/useLanguage.jsx";
 
 const typeList = [
   { key: "long-qualitative-aggressive", id: "wise-investor" },
@@ -16,10 +15,17 @@ const typeList = [
 
 export default function TypesPage() {
   const navigate = useNavigate();
+  const { lang, toggleLang, t } = useLanguage();
   const [selectedType, setSelectedType] = useState(null);
   const [selectedRelation, setSelectedRelation] = useState(null);
 
-  const selectedTypeData = selectedType ? investmentTypes[selectedType] : null;
+  const selectedTypeData = selectedType ? t.types_data[selectedType] : null;
+
+  const getRelation = (id1, id2) => {
+    const key1 = `${id1}_${id2}`;
+    const key2 = `${id2}_${id1}`;
+    return t.relations_data[key1] || t.relations_data[key2] || null;
+  };
 
   return (
     <div
@@ -35,10 +41,24 @@ export default function TypesPage() {
         }}
       />
 
+      {/* 언어 토글 */}
+      <button
+        onClick={toggleLang}
+        className="fixed top-6 right-6 z-20 font-semibold px-3 py-1.5 rounded-xl text-xs transition-all duration-200 hover:scale-105"
+        style={{
+          background: "#FFFFFF",
+          border: "1.5px solid #1A1A2E12",
+          color: "#1A1A2E60",
+          boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
+        }}
+      >
+        {lang === "ko" ? "EN" : "KR"}
+      </button>
+
       {/* 상단 8색 레인보우 바 */}
       <div className="w-full h-2 flex-shrink-0 flex">
         {typeList.map(({ key }) => {
-          const type = investmentTypes[key];
+          const type = t.types_data[key];
           return (
             <div
               key={key}
@@ -57,20 +77,20 @@ export default function TypesPage() {
           style={{
             background: "#FFFFFF",
             border: "1.5px solid #1A1A2E12",
-            color: "#1A1A2E75",
+            color: "#1A1A2E60",
             boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
           }}
         >
-          처음으로
+          {t.types.back}
         </button>
 
         <div className="flex items-center gap-2 mb-3">
           <div className="h-px w-6" style={{ background: "#1A1A2E25" }} />
           <p
             className="text-xs tracking-[0.25em] uppercase font-medium"
-            style={{ color: "#1A1A2E60" }}
+            style={{ color: "#1A1A2E40" }}
           >
-            Investor Archetypes
+            {t.types.badge}
           </p>
         </div>
         <h1
@@ -81,10 +101,10 @@ export default function TypesPage() {
             letterSpacing: "-0.02em",
           }}
         >
-          투자자 유형 탐색
+          {t.types.title}
         </h1>
         <p className="text-sm" style={{ color: "#1A1A2E65", wordBreak: "keep-all" }}>
-          8가지 투자자 유형을 선택하고, 유형 간의 관계를 탐색해보세요.
+          {t.types.subtitle}
         </p>
       </div>
 
@@ -94,11 +114,11 @@ export default function TypesPage() {
           className="text-xs uppercase tracking-widest mb-3 font-semibold"
           style={{ color: "#1A1A2E50" }}
         >
-          유형 선택
+          {t.types.selectLabel}
         </p>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
           {typeList.map(({ key }) => {
-            const type = investmentTypes[key];
+            const type = t.types_data[key];
             const isSelected = selectedType === key;
             return (
               <button
@@ -172,7 +192,7 @@ export default function TypesPage() {
             </h2>
             <p
               className="text-sm"
-              style={{ color: "#1A1A2E80", wordBreak: "keep-all" }}
+              style={{ color: "#1A1A2E65", wordBreak: "keep-all" }}
             >
               "{selectedTypeData.philosophy}"
             </p>
@@ -183,26 +203,26 @@ export default function TypesPage() {
             className="text-xs uppercase tracking-widest mb-3 font-semibold"
             style={{ color: "#1A1A2E50" }}
           >
-            다른 유형과의 관계
+            {t.types.relationsLabel}
           </p>
           <div className="flex flex-col gap-2.5 mb-6">
             {typeList
               .filter(({ key }) => key !== selectedType)
               .sort((a, b) => {
                 const relationA = getRelation(
-                  typeList.find((t) => t.key === selectedType)?.id, a.id
+                  typeList.find((tp) => tp.key === selectedType)?.id, a.id
                 );
                 const relationB = getRelation(
-                  typeList.find((t) => t.key === selectedType)?.id, b.id
+                  typeList.find((tp) => tp.key === selectedType)?.id, b.id
                 );
                 return (relationB?.grade ?? 2) - (relationA?.grade ?? 2);
               })
               .map(({ key, id }) => {
-                const type = investmentTypes[key];
+                const type = t.types_data[key];
                 const relation = getRelation(
-                  typeList.find((t) => t.key === selectedType)?.id, id
+                  typeList.find((tp) => tp.key === selectedType)?.id, id
                 );
-                const grade = gradeConfig[relation?.grade ?? 2];
+                const grade = t.gradeConfig_data[relation?.grade ?? 2];
                 const isSelected = selectedRelation === key;
 
                 return (
@@ -244,7 +264,7 @@ export default function TypesPage() {
                               {type.name}
                             </p>
                             <p className="text-xs font-medium" style={{ color: type.color.primary }}>
-                              {relation?.title || "관계 분석 중"}
+                              {relation?.title || "—"}
                             </p>
                           </div>
                         </div>
@@ -304,7 +324,7 @@ export default function TypesPage() {
               letterSpacing: "0.01em",
             }}
           >
-            나의 투자 DNA 분석하기
+            {t.types.cta}
           </button>
         </div>
       )}
@@ -321,29 +341,24 @@ export default function TypesPage() {
                 <div
                   key={key}
                   className="w-2 h-2 rounded-full"
-                  style={{ background: investmentTypes[key].color.primary }}
+                  style={{ background: t.types_data[key].color.primary }}
                 />
               ))}
             </div>
           </div>
-          <p className="text-sm" style={{ color: "#1A1A2E60" }}>
-            위에서 유형을 선택하면 관계 분석이 시작됩니다.
+          <p className="text-sm" style={{ color: "#1A1A2E50" }}>
+            {t.types.empty}
           </p>
         </div>
       )}
 
       {/* 면책 문구 */}
       <div className="text-center flex flex-col gap-1 relative z-10 mt-4 mb-8">
-        <p
-          className="text-xs"
-          style={{ color: "#1A1A2E40", wordBreak: "keep-all" }}
-        >
-          본 테스트는 교육 및 오락 목적으로 제공되며,
-          <br />
-          투자 권유 또는 투자 자문이 아닙니다.
+        <p className="text-xs" style={{ color: "#1A1A2E40", wordBreak: "keep-all" }}>
+          {t.types.disclaimer}
         </p>
         <p className="text-xs" style={{ color: "#1A1A2E30" }}>
-          © 2026 InvestDNA. All rights reserved.
+          {t.types.copyright}
         </p>
       </div>
     </div>
