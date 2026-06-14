@@ -44,6 +44,7 @@ export const en = {
     compatibleLabel: "Best Match",
     exploreRelations: "Explore all type relationships →",
     share: "Share My Results 🔗",
+    saveImage: "Save as Image",
     retake: "Take the Test Again",
     disclaimer: "This test is for educational and entertainment purposes only and does not constitute investment advice.",
     copyright: "© 2026 InvestDNA. All rights reserved.",

@@ -46,6 +46,7 @@ export const ko = {
     compatibleLabel: "궁합 유형",
     exploreRelations: "모든 유형 간 관계 탐색하기 →",
     share: "결과 공유하기 🔗",
+    saveImage: "이미지로 저장하기",
     retake: "다시 테스트하기",
     disclaimer: "본 테스트는 교육 및 오락 목적으로 제공되며, 투자 권유 또는 투자 자문이 아닙니다.",
     copyright: "© 2026 InvestDNA. All rights reserved.",
