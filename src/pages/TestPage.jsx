@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "../hooks/useLanguage.jsx";
 import { calculateResult } from "../utils/scoring";
@@ -10,23 +10,71 @@ export default function TestPage() {
   const [answers, setAnswers] = useState([]);
   const [selected, setSelected] = useState(null);
   const [animating, setAnimating] = useState(false);
-  const [fadeIn, setFadeIn] = useState(true);
+  const [cardState, setCardState] = useState("enter"); // "enter" | "idle" | "exit-left" | "exit-right"
+  const [mounted, setMounted] = useState(false);
+  const [optionsMounted, setOptionsMounted] = useState(false);
 
   const questions = t.questions_data;
   const currentQuestion = questions[currentIndex];
-  const progress = (currentIndex / questions.length) * 100;
+  const progress = ((currentIndex) / questions.length) * 100;
+  const progressFull = ((currentIndex + 1) / questions.length) * 100;
 
-  const transitionTo = (callback) => {
-    setAnimating(true);
-    setFadeIn(false);
-    setTimeout(() => {
-      callback();
-      setFadeIn(true);
-      setAnimating(false);
-    }, 250);
+  // 첫 진입 애니메이션
+  useEffect(() => {
+    const t1 = setTimeout(() => setMounted(true), 50);
+    const t2 = setTimeout(() => setCardState("idle"), 50);
+    const t3 = setTimeout(() => setOptionsMounted(true), 200);
+    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
+  }, []);
+
+  const getCardStyle = () => {
+    switch (cardState) {
+      case "enter":
+        return { opacity: 0, transform: "translateY(24px) scale(0.98)" };
+      case "idle":
+        return {
+          opacity: 1,
+          transform: "translateY(0px) scale(1)",
+          transition: "opacity 0.45s ease, transform 0.45s ease",
+        };
+      case "exit-left":
+        return {
+          opacity: 0,
+          transform: "translateX(-32px) scale(0.97)",
+          transition: "opacity 0.2s ease, transform 0.2s ease",
+        };
+      case "exit-right":
+        return {
+          opacity: 0,
+          transform: "translateX(32px) scale(0.97)",
+          transition: "opacity 0.2s ease, transform 0.2s ease",
+        };
+      default:
+        return {};
+    }
   };
 
-  const handleSelect = (option) => setSelected(option);
+  const transitionTo = (direction, callback) => {
+    setAnimating(true);
+    setOptionsMounted(false);
+    setCardState(direction === "forward" ? "exit-left" : "exit-right");
+    setTimeout(() => {
+      callback();
+      setCardState("enter");
+      setTimeout(() => {
+        setCardState("idle");
+        setTimeout(() => {
+          setOptionsMounted(true);
+          setAnimating(false);
+        }, 100);
+      }, 30);
+    }, 220);
+  };
+
+  const handleSelect = (option) => {
+    if (animating) return;
+    setSelected(option);
+  };
 
   const handleNext = () => {
     if (selected === null || animating) return;
@@ -38,7 +86,7 @@ export default function TestPage() {
       const result = calculateResult(newAnswers);
       navigate(`/result/${result.type.id}`, { state: { scores: result.scores } });
     } else {
-      transitionTo(() => {
+      transitionTo("forward", () => {
         setAnswers(newAnswers);
         setCurrentIndex(currentIndex + 1);
         setSelected(null);
@@ -51,7 +99,7 @@ export default function TestPage() {
     if (currentIndex === 0) {
       navigate("/");
     } else {
-      transitionTo(() => {
+      transitionTo("backward", () => {
         setAnswers(answers.slice(0, -1));
         setCurrentIndex(currentIndex - 1);
         setSelected(null);
@@ -81,22 +129,40 @@ export default function TestPage() {
           border: "1.5px solid #1A1A2E12",
           color: "#1A1A2E60",
           boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
+          opacity: mounted ? 1 : 0,
+          transition: "opacity 0.4s ease 0.3s",
         }}
       >
         {lang === "ko" ? "EN" : "KR"}
       </button>
 
       {/* 헤더 */}
-      <div className="w-full max-w-lg mb-6 relative z-10">
+      <div
+        className="w-full max-w-lg mb-6 relative z-10"
+        style={{
+          opacity: mounted ? 1 : 0,
+          transform: mounted ? "translateY(0px)" : "translateY(-12px)",
+          transition: "opacity 0.4s ease 0.1s, transform 0.4s ease 0.1s",
+        }}
+      >
         <div className="flex justify-between items-center mb-4">
           <button
             onClick={handleBack}
-            className="font-medium px-4 py-2 rounded-xl text-sm transition-all duration-200 hover:scale-105"
+            className="font-medium px-4 py-2 rounded-xl text-sm"
             style={{
               background: "#FFFFFF",
               border: "1.5px solid #1A1A2E12",
               color: "#1A1A2E60",
               boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
+              transition: "transform 0.15s ease, box-shadow 0.15s ease",
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.transform = "scale(1.04)";
+              e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.1)";
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.transform = "scale(1)";
+              e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,0.06)";
             }}
           >
             {currentIndex === 0 ? t.test.first : t.test.prev}
@@ -113,13 +179,29 @@ export default function TestPage() {
           </span>
         </div>
 
+        {/* 프로그레스 바 */}
         <div
-          className="w-full rounded-full overflow-hidden"
+          className="w-full rounded-full overflow-hidden relative"
           style={{ height: "3px", background: "#1A1A2E08" }}
         >
+          {/* 완료된 구간 */}
           <div
-            className="h-full rounded-full transition-all duration-500"
-            style={{ width: `${progress}%`, background: "#D97706" }}
+            className="h-full rounded-full absolute left-0 top-0"
+            style={{
+              width: `${progress}%`,
+              background: "#D9770640",
+              transition: "width 0.4s ease",
+            }}
+          />
+          {/* 현재 진행 */}
+          <div
+            className="h-full rounded-full absolute left-0 top-0"
+            style={{
+              width: `${progressFull}%`,
+              background: "#D97706",
+              transition: "width 0.4s ease",
+              boxShadow: "0 0 6px #D9770660",
+            }}
           />
         </div>
       </div>
@@ -127,11 +209,7 @@ export default function TestPage() {
       {/* 질문 카드 */}
       <div
         className="max-w-lg w-full relative z-10"
-        style={{
-          opacity: fadeIn ? 1 : 0,
-          transform: fadeIn ? "translateY(0px)" : "translateY(10px)",
-          transition: "opacity 0.25s ease, transform 0.25s ease",
-        }}
+        style={getCardStyle()}
       >
         <div
           className="rounded-3xl overflow-hidden"
@@ -141,9 +219,13 @@ export default function TestPage() {
             border: "1.5px solid #1A1A2E08",
           }}
         >
+          {/* 질문 영역 */}
           <div className="px-7 pt-7 pb-6" style={{ borderBottom: "1px solid #1A1A2E06" }}>
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-1.5 h-1.5 rounded-full" style={{ background: "#D97706" }} />
+              <div
+                className="w-1.5 h-1.5 rounded-full"
+                style={{ background: "#D97706", boxShadow: "0 0 4px #D9770680" }}
+              />
               <span
                 className="text-xs font-medium uppercase tracking-widest"
                 style={{ color: "#1A1A2E35" }}
@@ -165,6 +247,7 @@ export default function TestPage() {
             </p>
           </div>
 
+          {/* 옵션 — 스태거 애니메이션 */}
           <div className="p-4 flex flex-col gap-2">
             {currentQuestion.options.map((option, index) => {
               const isSelected = selected?.text === option.text;
@@ -172,19 +255,26 @@ export default function TestPage() {
                 <button
                   key={index}
                   onClick={() => handleSelect(option)}
-                  className="w-full text-left rounded-2xl transition-all duration-200 flex items-center gap-3"
+                  className="w-full text-left rounded-2xl flex items-center gap-3"
                   style={{
                     padding: "14px 16px",
                     background: isSelected ? "#FEF3C7" : "#F7F5F0",
                     border: isSelected ? "1.5px solid #D97706" : "1.5px solid transparent",
-                    transform: isSelected ? "scale(1.01)" : "scale(1)",
+                    transform: optionsMounted
+                      ? isSelected ? "scale(1.01)" : "scale(1)"
+                      : "translateY(10px)",
+                    opacity: optionsMounted ? 1 : 0,
+                    transition: `opacity 0.3s ease ${index * 0.06}s, transform 0.3s ease ${index * 0.06}s, background 0.15s ease, border-color 0.15s ease`,
+                    boxShadow: isSelected ? "0 2px 12px rgba(217,119,6,0.15)" : "none",
                   }}
                 >
                   <span
-                    className="w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-all duration-200"
+                    className="w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center"
                     style={{
                       borderColor: isSelected ? "#D97706" : "#1A1A2E20",
                       background: isSelected ? "#D97706" : "transparent",
+                      transition: "all 0.15s ease",
+                      flexShrink: 0,
                     }}
                   >
                     {isSelected && (
@@ -198,6 +288,7 @@ export default function TestPage() {
                     style={{
                       color: isSelected ? "#92400E" : "#1A1A2E70",
                       wordBreak: "keep-all",
+                      transition: "color 0.15s ease",
                     }}
                   >
                     {option.text}
@@ -207,16 +298,37 @@ export default function TestPage() {
             })}
           </div>
 
+          {/* 다음 버튼 */}
           <div className="px-4 pb-4">
             <button
               onClick={handleNext}
               disabled={selected === null || animating}
-              className="w-full py-4 rounded-2xl font-bold text-base transition-all duration-200"
+              className="w-full py-4 rounded-2xl font-bold text-base"
               style={{
                 background: selected !== null ? "#1A1A2E" : "#1A1A2E08",
                 color: selected !== null ? "#F7F5F0" : "#1A1A2E25",
                 cursor: selected !== null ? "pointer" : "not-allowed",
                 boxShadow: selected !== null ? "0 4px 16px rgba(26,26,46,0.2)" : "none",
+                transform: "scale(1)",
+                transition: "background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease",
+              }}
+              onMouseEnter={e => {
+                if (selected !== null) {
+                  e.currentTarget.style.transform = "scale(1.02)";
+                  e.currentTarget.style.boxShadow = "0 6px 20px rgba(26,26,46,0.28)";
+                }
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.transform = "scale(1)";
+                e.currentTarget.style.boxShadow = selected !== null
+                  ? "0 4px 16px rgba(26,26,46,0.2)"
+                  : "none";
+              }}
+              onMouseDown={e => {
+                if (selected !== null) e.currentTarget.style.transform = "scale(0.98)";
+              }}
+              onMouseUp={e => {
+                if (selected !== null) e.currentTarget.style.transform = "scale(1.02)";
               }}
             >
               {currentIndex + 1 === questions.length ? t.test.result : t.test.next}
@@ -225,7 +337,13 @@ export default function TestPage() {
         </div>
       </div>
 
-      <div className="mt-8 text-center flex flex-col gap-1 relative z-10">
+      <div
+        className="mt-8 text-center flex flex-col gap-1 relative z-10"
+        style={{
+          opacity: mounted ? 1 : 0,
+          transition: "opacity 0.4s ease 0.5s",
+        }}
+      >
         <p className="text-xs" style={{ color: "#1A1A2E25" }}>
           {t.test.disclaimer}
         </p>

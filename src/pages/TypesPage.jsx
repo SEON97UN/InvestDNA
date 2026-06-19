@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "../hooks/useLanguage.jsx";
 
@@ -18,8 +18,22 @@ export default function TypesPage() {
   const { lang, toggleLang, t } = useLanguage();
   const [selectedType, setSelectedType] = useState(null);
   const [selectedRelation, setSelectedRelation] = useState(null);
+  const [mounted, setMounted] = useState(false);
+  const [detailMounted, setDetailMounted] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setMounted(true), 50);
+    return () => clearTimeout(timer);
+  }, []);
 
   const selectedTypeData = selectedType ? t.types_data[selectedType] : null;
+
+  const handleSelectType = (key) => {
+    setDetailMounted(false);
+    setSelectedType(key);
+    setSelectedRelation(null);
+    setTimeout(() => setDetailMounted(true), 50);
+  };
 
   const getRelation = (id1, id2) => {
     const key1 = `${id1}_${id2}`;
@@ -50,35 +64,59 @@ export default function TypesPage() {
           border: "1.5px solid #1A1A2E12",
           color: "#1A1A2E60",
           boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
+          opacity: mounted ? 1 : 0,
+          transition: "opacity 0.4s ease 0.6s",
         }}
       >
         {lang === "ko" ? "EN" : "KR"}
       </button>
 
-      {/* 상단 8색 레인보우 바 */}
+      {/* 상단 8색 레인보우 바 — 순차 점등 */}
       <div className="w-full h-2 flex-shrink-0 flex">
-        {typeList.map(({ key }) => {
+        {typeList.map(({ key }, i) => {
           const type = t.types_data[key];
           return (
             <div
               key={key}
               className="flex-1 h-full"
-              style={{ background: type.color.primary }}
+              style={{
+                background: type.color.primary,
+                opacity: mounted ? 1 : 0,
+                transform: mounted ? "scaleX(1)" : "scaleX(0)",
+                transformOrigin: "left",
+                transition: `opacity 0.4s ease ${i * 0.06}s, transform 0.4s ease ${i * 0.06}s`,
+              }}
             />
           );
         })}
       </div>
 
       {/* 헤더 */}
-      <div className="w-full max-w-2xl mt-10 mb-8 relative z-10">
+      <div
+        className="w-full max-w-2xl mt-10 mb-8 relative z-10"
+        style={{
+          opacity: mounted ? 1 : 0,
+          transform: mounted ? "translateY(0px)" : "translateY(16px)",
+          transition: "opacity 0.5s ease 0.2s, transform 0.5s ease 0.2s",
+        }}
+      >
         <button
           onClick={() => navigate("/")}
-          className="font-medium px-4 py-2 rounded-xl text-sm transition-all duration-200 hover:scale-105 mb-6 block"
+          className="font-medium px-4 py-2 rounded-xl text-sm mb-6 block"
           style={{
             background: "#FFFFFF",
             border: "1.5px solid #1A1A2E12",
             color: "#1A1A2E60",
             boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
+            transition: "transform 0.15s ease, box-shadow 0.15s ease",
+          }}
+          onMouseEnter={e => {
+            e.currentTarget.style.transform = "scale(1.04)";
+            e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.1)";
+          }}
+          onMouseLeave={e => {
+            e.currentTarget.style.transform = "scale(1)";
+            e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,0.06)";
           }}
         >
           {t.types.back}
@@ -108,8 +146,14 @@ export default function TypesPage() {
         </p>
       </div>
 
-      {/* 유형 선택 그리드 */}
-      <div className="w-full max-w-2xl mb-8 relative z-10">
+      {/* 유형 선택 그리드 — 스태거 */}
+      <div
+        className="w-full max-w-2xl mb-8 relative z-10"
+        style={{
+          opacity: mounted ? 1 : 0,
+          transition: "opacity 0.4s ease 0.3s",
+        }}
+      >
         <p
           className="text-xs uppercase tracking-widest mb-3 font-semibold"
           style={{ color: "#1A1A2E50" }}
@@ -117,17 +161,14 @@ export default function TypesPage() {
           {t.types.selectLabel}
         </p>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-          {typeList.map(({ key }) => {
+          {typeList.map(({ key }, i) => {
             const type = t.types_data[key];
             const isSelected = selectedType === key;
             return (
               <button
                 key={key}
-                onClick={() => {
-                  setSelectedType(key);
-                  setSelectedRelation(null);
-                }}
-                className="rounded-2xl p-3 flex flex-col items-center gap-1.5 transition-all duration-200 hover:scale-105"
+                onClick={() => handleSelectType(key)}
+                className="rounded-2xl p-3 flex flex-col items-center gap-1.5"
                 style={{
                   background: "#FFFFFF",
                   border: isSelected
@@ -137,15 +178,39 @@ export default function TypesPage() {
                     ? `0 4px 16px ${type.color.primary}20`
                     : "0 1px 4px rgba(26,26,46,0.04)",
                   minHeight: "72px",
+                  opacity: mounted ? 1 : 0,
+                  transform: mounted ? "translateY(0px) scale(1)" : "translateY(16px) scale(0.96)",
+                  transition: `opacity 0.4s ease ${0.35 + i * 0.05}s, transform 0.4s ease ${0.35 + i * 0.05}s, border 0.15s ease, box-shadow 0.15s ease`,
+                }}
+                onMouseEnter={e => {
+                  if (!isSelected) {
+                    e.currentTarget.style.transform = "translateY(-2px) scale(1.04)";
+                    e.currentTarget.style.boxShadow = `0 4px 16px ${type.color.primary}20`;
+                    e.currentTarget.style.borderColor = `${type.color.primary}30`;
+                  }
+                }}
+                onMouseLeave={e => {
+                  if (!isSelected) {
+                    e.currentTarget.style.transform = "translateY(0px) scale(1)";
+                    e.currentTarget.style.boxShadow = "0 1px 4px rgba(26,26,46,0.04)";
+                    e.currentTarget.style.borderColor = "#1A1A2E08";
+                  }
                 }}
               >
                 <div
                   className="w-2 h-2 rounded-full"
-                  style={{ background: type.color.primary }}
+                  style={{
+                    background: type.color.primary,
+                    boxShadow: isSelected ? `0 0 6px ${type.color.primary}80` : "none",
+                    transition: "box-shadow 0.15s ease",
+                  }}
                 />
                 <span
                   className="text-xs font-bold text-center leading-tight"
-                  style={{ color: isSelected ? type.color.primary : "#1A1A2E65" }}
+                  style={{
+                    color: isSelected ? type.color.primary : "#1A1A2E65",
+                    transition: "color 0.15s ease",
+                  }}
                 >
                   {type.name}
                 </span>
@@ -157,8 +222,14 @@ export default function TypesPage() {
 
       {/* 선택된 유형 상세 */}
       {selectedTypeData && (
-        <div className="w-full max-w-2xl relative z-10 pb-6">
-
+        <div
+          className="w-full max-w-2xl relative z-10 pb-6"
+          style={{
+            opacity: detailMounted ? 1 : 0,
+            transform: detailMounted ? "translateY(0px)" : "translateY(20px)",
+            transition: "opacity 0.4s ease, transform 0.4s ease",
+          }}
+        >
           {/* 유형 헤더 카드 */}
           <div
             className="rounded-2xl p-5 mb-4"
@@ -171,7 +242,10 @@ export default function TypesPage() {
             <div className="flex items-center gap-2 mb-1">
               <div
                 className="w-2 h-2 rounded-full"
-                style={{ background: selectedTypeData.color.primary }}
+                style={{
+                  background: selectedTypeData.color.primary,
+                  boxShadow: `0 0 6px ${selectedTypeData.color.primary}80`,
+                }}
               />
               <p
                 className="text-xs uppercase tracking-widest font-semibold"
@@ -217,7 +291,7 @@ export default function TypesPage() {
                 );
                 return (relationB?.grade ?? 2) - (relationA?.grade ?? 2);
               })
-              .map(({ key, id }) => {
+              .map(({ key, id }, i) => {
                 const type = t.types_data[key];
                 const relation = getRelation(
                   typeList.find((tp) => tp.key === selectedType)?.id, id
@@ -229,7 +303,7 @@ export default function TypesPage() {
                   <button
                     key={key}
                     onClick={() => setSelectedRelation(isSelected ? null : key)}
-                    className="rounded-2xl transition-all duration-200 text-left overflow-hidden"
+                    className="rounded-2xl text-left overflow-hidden"
                     style={{
                       background: "#FFFFFF",
                       border: isSelected
@@ -238,6 +312,9 @@ export default function TypesPage() {
                       boxShadow: isSelected
                         ? `0 4px 16px ${type.color.primary}15`
                         : "0 1px 4px rgba(26,26,46,0.04)",
+                      opacity: detailMounted ? 1 : 0,
+                      transform: detailMounted ? "translateY(0px)" : "translateY(12px)",
+                      transition: `opacity 0.35s ease ${i * 0.04}s, transform 0.35s ease ${i * 0.04}s, border 0.15s ease, box-shadow 0.15s ease`,
                     }}
                   >
                     {isSelected && (
@@ -286,8 +363,9 @@ export default function TypesPage() {
                             <div
                               className="h-full rounded-full"
                               style={{
-                                width: `${((relation?.grade ?? 2) / 3) * 100}%`,
+                                width: detailMounted ? `${((relation?.grade ?? 2) / 3) * 100}%` : "0%",
                                 background: `linear-gradient(90deg, ${selectedTypeData.color.primary}, ${type.color.primary})`,
+                                transition: `width 0.6s ease ${i * 0.04}s`,
                               }}
                             />
                           </div>
@@ -316,13 +394,24 @@ export default function TypesPage() {
           {/* 테스트 유도 버튼 */}
           <button
             onClick={() => navigate("/test")}
-            className="w-full font-black py-4 rounded-2xl text-base transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+            className="w-full font-black py-4 rounded-2xl text-base"
             style={{
               background: "#1A1A2E",
               color: "#F7F5F0",
               boxShadow: "0 4px 20px rgba(26,26,46,0.2)",
               letterSpacing: "0.01em",
+              transition: "transform 0.15s ease, box-shadow 0.15s ease",
             }}
+            onMouseEnter={e => {
+              e.currentTarget.style.transform = "scale(1.02)";
+              e.currentTarget.style.boxShadow = "0 8px 28px rgba(26,26,46,0.3)";
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.transform = "scale(1)";
+              e.currentTarget.style.boxShadow = "0 4px 20px rgba(26,26,46,0.2)";
+            }}
+            onMouseDown={e => { e.currentTarget.style.transform = "scale(0.98)"; }}
+            onMouseUp={e => { e.currentTarget.style.transform = "scale(1.02)"; }}
           >
             {t.types.cta}
           </button>
@@ -331,7 +420,13 @@ export default function TypesPage() {
 
       {/* 유형 미선택 상태 */}
       {!selectedType && (
-        <div className="w-full max-w-2xl relative z-10 text-center py-6">
+        <div
+          className="w-full max-w-2xl relative z-10 text-center py-6"
+          style={{
+            opacity: mounted ? 1 : 0,
+            transition: "opacity 0.5s ease 0.8s",
+          }}
+        >
           <div
             className="w-12 h-12 rounded-2xl mx-auto mb-4 flex items-center justify-center"
             style={{ background: "#1A1A2E08" }}
@@ -353,7 +448,13 @@ export default function TypesPage() {
       )}
 
       {/* 면책 문구 */}
-      <div className="text-center flex flex-col gap-1 relative z-10 mt-4 mb-8">
+      <div
+        className="text-center flex flex-col gap-1 relative z-10 mt-4 mb-8"
+        style={{
+          opacity: mounted ? 1 : 0,
+          transition: "opacity 0.5s ease 0.9s",
+        }}
+      >
         <p className="text-xs" style={{ color: "#1A1A2E40", wordBreak: "keep-all" }}>
           {t.types.disclaimer}
         </p>
